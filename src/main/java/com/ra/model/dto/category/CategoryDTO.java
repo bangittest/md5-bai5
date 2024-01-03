@@ -1,31 +1,29 @@
-package com.ra.model.entity;
+package com.ra.model.dto.category;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.ra.model.entity.Product;
 import jakarta.persistence.*;
 
 import java.util.List;
-import java.util.Set;
 
-@Entity
-//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CategoryDTO {
     private Long id;
 
-    @Column(unique = true)
     private String categoryName;
-    @Column(columnDefinition = "boolean default true")
+
     private Boolean status=true;
-//    @OneToMany(mappedBy = "category")
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL)
+    //    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    @OneToMany(mappedBy = "category")
     private List<Product> products;
 
+    public CategoryDTO() {
+    }
 
-    public Category() {
+    public CategoryDTO(Long id, String categoryName, Boolean status) {
+        this.id = id;
+        this.categoryName = categoryName;
+        this.status = status;
     }
 
     public Long getId() {

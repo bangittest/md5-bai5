@@ -1,8 +1,13 @@
 package com.ra.controller;
 
+import com.ra.model.dto.category.CategoryDTO;
 import com.ra.model.entity.Category;
 import com.ra.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +19,30 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     CategoryService categoryService;
+
+    @GetMapping("v1/api/search")
+    public ResponseEntity<?>searchCategory(@RequestParam(defaultValue = "0",name = "page") Integer noPage,
+                                           @RequestParam(defaultValue = "5",name = "limit") Integer limit,
+                                           @RequestParam(name = "keyword") String keyword,
+                                           @RequestParam(defaultValue = "id" ,name = "sort") String sort,
+                                           @RequestParam(defaultValue = "asc",name = "order")String order){
+        Pageable pageable;
+        if (order.equals("desc")){
+            pageable=PageRequest.of(noPage,limit, Sort.by(sort).descending());
+        }else {
+            pageable=PageRequest.of(noPage,limit, Sort.by(sort).ascending());
+        }
+        Page<CategoryDTO>categoryDTOPage=categoryService.categoryNavigationSeach(pageable,keyword);
+        return new ResponseEntity<>(categoryDTOPage,HttpStatus.OK);
+    }
+
+    @GetMapping("v1/api/category")
+    public ResponseEntity<?>pageCategory(@RequestParam(defaultValue = "0" ,name = "page") int noPage,
+                                         @RequestParam(defaultValue = "5",name = "limit")int limit){
+        Pageable pageable= PageRequest.of(noPage,limit);
+        Page<CategoryDTO>categories=categoryService.categoryNavigation(pageable);
+        return new ResponseEntity<>(categories,HttpStatus.OK);
+    }
     @GetMapping("/category")
     public ResponseEntity<List<Category>>category(){
         List<Category> list=categoryService.getAll();
